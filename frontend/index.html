@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book-Bite Action Agent</title>
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-glow: #1a1025;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-glow: #8b5cf6;
+            --accent-solid: #6d28d9;
+            --accent-hover: #7c3aed;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.1), transparent 25%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.8s ease-out backwards 0.2s;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: #d1d5db;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* Quick Fill Chips Styling */
+        .quick-fills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .chip {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            color: #c4b5fd;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .chip:hover {
+            background: rgba(139, 92, 246, 0.25);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        select,
+        textarea {
+            width: 100%;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            cursor: pointer;
+        }
+
+        select option {
+            background-color: #1f2937;
+            color: #fff;
+        }
+
+        textarea {
+            height: 130px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        textarea::placeholder {
+            color: #4b5563;
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--accent-solid), var(--accent-hover));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px var(--accent-glow);
+        }
+
+        .btn-generate:active {
+            transform: translateY(1px);
+        }
+
+        .btn-generate:disabled {
+            background: #374151;
+            color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+            display: none;
+        }
+
+        .output-wrapper {
+            display: none;
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .output-wrapper.active {
+            display: block;
+        }
+
+        .output-content {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: #e5e7eb;
+        }
+
+        .output-content h1,
+        .output-content h2,
+        .output-content h3 {
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+            margin-top: 1.8em;
+            margin-bottom: 0.8em;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .output-content h1:first-child,
+        .output-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .output-content p {
+            margin-bottom: 1.4em;
+        }
+
+        .output-content strong {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .output-content ul,
+        .output-content ol {
+            margin-bottom: 1.5em;
+            padding-left: 1.2em;
+        }
+
+        .output-content li {
+            margin-bottom: 0.6em;
+        }
+
+        .output-content li::marker {
+            color: var(--accent-glow);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Book-Bite</h1>
+            <p>Turn life & tech friction into 1-minute action plans from world-class authors.</p>
+        </div>
+
+        <div class="glass-card">
+            <div class="input-group">
+                <label for="author">Select your advisor</label>
+                <select id="author">
+                    <option value="General Advisor (Best Practices)">✦ General Advisor (Best Practices)</option>
+                    <option value="James Clear (Atomic Habits)">James Clear (Atomic Habits)</option>
+                    <option value="Darius Foroux (Do It Today)">Darius Foroux (Do It Today)</option>
+                    <option value="Thibaut Meurisse (Dopamine Detox)">Thibaut Meurisse (Dopamine Detox)</option>
+                    <option value="Morgan Housel (The Psychology of Money)">Morgan Housel (The Psychology of Money)
+                    </option>
+                    <option value="Robert Greene (The 48 Laws of Power)">Robert Greene (The 48 Laws of Power)</option>
+                    <option value="Jordan Peterson (12 Rules for Life)">Jordan Peterson (12 Rules for Life)</option>
+                    <option value="Ryan Holiday (The Obstacle Is the Way)">Ryan Holiday (The Obstacle Is the Way)
+                    </option>
+                    <option value="Mark Manson (The Subtle Art of Not Giving a F*ck)">Mark Manson (The Subtle Art of Not
+                        Giving a F*ck)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="problem">Describe your immediate challenge</label>
+
+                <!-- Quick Fills Added Here -->
+                <div class="quick-fills">
+                    <span class="chip"
+                        onclick="fillPrompt('I have a major project deadline in a few days, but I keep finding excuses to do minor tasks instead of starting the actual work.')">⏳
+                        Procrastination</span>
+                    <span class="chip"
+                        onclick="fillPrompt('I am trying to learn AWS, Docker, and microservices all at once. I feel completely overwhelmed and paralyzed by the amount of information.')">🤯
+                        Tech Overwhelm</span>
+                    <span class="chip"
+                        onclick="fillPrompt('I spend too much time trying to make my code and architecture perfect, which leads to me never actually finishing or deploying anything.')">🎯
+                        Perfectionism</span>
+                    <span class="chip"
+                        onclick="fillPrompt('I know I need to study for my certification exam, but I keep waiting to feel motivated before opening my books.')">🔋
+                        Low Motivation</span>
+                </div>
+
+                <textarea id="problem" placeholder="e.g., I have a major project deadline in a few days..."></textarea>
+            </div>
+
+            <button id="generate-btn" class="btn-generate" onclick="generateAdvice()">
+                <span id="btn-spinner" class="spinner"></span>
+                <span id="btn-text">Generate Action Plan</span>
+            </button>
+        </div>
+
+        <div id="output-wrapper" class="glass-card output-wrapper">
+            <div id="output-content" class="output-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // INSERT YOUR API GATEWAY URL HERE
+        const API_URL = "https://np7a2z40xd.execute-api.us-east-1.amazonaws.com/prod/analyze";
+
+        // Function to handle the Quick Fill chips
+        function fillPrompt(text) {
+            const textarea = document.getElementById('problem');
+            textarea.value = text;
+
+            // Optional: Briefly highlight the textarea to show it updated
+            textarea.style.borderColor = "var(--accent-glow)";
+            setTimeout(() => {
+                textarea.style.borderColor = "var(--glass-border)";
+            }, 400);
+        }
+
+        async function generateAdvice() {
+            const problemText = document.getElementById('problem').value.trim();
+            const authorText = document.getElementById('author').value;
+            const btn = document.getElementById('generate-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const outputWrapper = document.getElementById('output-wrapper');
+            const outputContent = document.getElementById('output-content');
+
+            if (!problemText) {
+                alert("Please describe the challenge you are facing.");
+                document.getElementById('problem').focus();
+                return;
+            }
+
+            let displayAuthor = authorText.includes("General") ? "Advisor" : authorText.split(' ')[0];
+
+            btn.disabled = true;
+            btnSpinner.style.display = "inline-block";
+            btnText.innerText = `Consulting ${displayAuthor}...`;
+            outputWrapper.classList.remove('active');
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ problem: problemText, author: authorText })
+                });
+
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                marked.setOptions({ breaks: true });
+                outputContent.innerHTML = marked.parse(data.action_plan);
+
+                outputWrapper.classList.add('active');
+
+                setTimeout(() => {
+                    outputWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+
+            } catch (err) {
+                outputContent.innerHTML = `<p style="color: #ef4444; font-family: 'Inter', sans-serif;"><strong>Connection Error:</strong> ${err.message}</p>`;
+                outputWrapper.classList.add('active');
+            } finally {
+                btn.disabled = false;
+                btnSpinner.style.display = "none";
+                btnText.innerText = "Generate Action Plan";
+            }
+        }
+    </script>
+</body>
+
+</html>
