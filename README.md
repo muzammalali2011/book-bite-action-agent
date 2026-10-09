@@ -3,7 +3,9 @@
 > **Turn procrastination and mental friction into zero-fluff, 1-minute action plans powered by world-class thinkers.**
 
 [![AWS](https://img.shields.io/badge/AWS-Serverless-orange.svg)](https://aws.amazon.com/)
-[![Bedrock](https://img.shields.io/badge/Amazon%20Bedrock-Claude%20Haiku-purple.svg)](https://aws.amazon.com/bedrock/)
+[![Amazon S3](https://img.shields.io/badge/Frontend-Amazon%20S3-569A31.svg)](https://aws.amazon.com/s3/)
+[![AWS Lambda](https://img.shields.io/badge/Backend-AWS%20Lambda-FF9900.svg)](https://aws.amazon.com/lambda/)
+[![Amazon Bedrock](https://img.shields.io/badge/AI-Amazon%20Bedrock-0073BB.svg)](https://aws.amazon.com/bedrock/)
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg)](https://book-bite-frontend-2026.s3.us-east-1.amazonaws.com/index.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -11,40 +13,43 @@
 
 ## 🚀 Live Demo
 
-Experience the agent in production:  
+Experience the agent running live in production:  
 🔗 **[Book-Bite Action Agent Web App](https://book-bite-frontend-2026.s3.us-east-1.amazonaws.com/index.html)**
 
 ---
 
 ## 💡 Overview
 
-Standard chatbots often provide verbose, generic, or passive advice that increases cognitive fatigue. **Book-Bite** takes a different approach:
-- **Zero Fluff:** Delivers concise, high-impact tactical advice readable in under 60 seconds.
-- **Dynamic Persona Injection:** Adopts the specific vocabulary, philosophy, and tone of selected authors (e.g., James Clear, Robert Greene, Mark Manson) or a generalized best-practice advisor.
-- **Frictionless Onboarding:** Pre-configured suggestion chips let users test scenarios like tech paralysis or low motivation with a single click.
+Standard chatbots often provide verbose, generic, or passive advice that increases cognitive fatigue. **Book-Bite** was built for the **AWS Build an Agent Weekend Challenge** to deliver an immediate, delightful experience:
 
----
-1. **Frontend:** Glassmorphism UI hosted on **Amazon S3** static website hosting, utilizing **Marked.js** to render clean typography and structured bullet points.
-2. **API Layer:** **Amazon API Gateway** (REST API) with CORS configured for cross-origin client requests.
-3. **Compute:** **AWS Lambda** (Python 3.12 runtime) parsing input parameters and assembling author-specific system prompts.
-4. **Intelligence:** **Amazon Bedrock** invoking Anthropic Claude 3 Haiku for sub-second, cost-effective inference.
+- **Zero Fluff:** Tactical, concise advice designed to be read in under 60 seconds.
+- **Dynamic Persona Injection:** Adopts the exact voice, philosophy, and framework of chosen authors (e.g., James Clear, Robert Greene, Mark Manson) or a generalized best-practice advisor.
+- **Frictionless Testing:** Interactive Quick-Fill chips allow users to test challenges like *Tech Overwhelm*, *Procrastination*, and *Perfectionism* with one click.
 
 ---
 
-## 🛠️ Tech Stack
+## 🏗️ AWS Services Used
+The application is built 100% serverless using AWS Free Tier services:
 
-- **Cloud Platform:** Amazon Web Services (AWS Free Tier compatible)
-- **AI / LLM:** Amazon Bedrock (`us.anthropic.claude-haiku-4-5-20251001-v1:0`)
-- **Backend:** Python 3.12, `boto3`
-- **Frontend:** Vanilla HTML5, CSS3, JavaScript (ES6+), Marked.js
+1. **Frontend Hosting (Amazon S3):**  
+   The single-page web interface (`index.html`) is hosted directly on an **Amazon S3** bucket configured for static website hosting, providing high availability with zero server management.
+2. **API Layer (Amazon API Gateway):**  
+   Serves as the secure public REST API gateway with CORS enabled (`OPTIONS` and `POST` methods) to receive frontend queries.
+3. **Compute Engine (AWS Lambda):**  
+   A serverless **Python 3.12** Lambda function handles input validation, dynamic prompt engineering based on the selected author persona, and model invocation.
+4. **Foundational Model (Amazon Bedrock):**  
+   Powers the intelligence layer via Anthropic Claude 3 Haiku (`us.anthropic.claude-haiku-4-5-20251001-v1:0`), chosen for ultra-fast response times and high instruction compliance.
 
 ---
 
-## 📂 Project Structure
+## 📂 Repository Structure
 
 ```text
+book-bite-action-agent/
+│
 ├── frontend/
-│   └── index.html          # Frontend web app with suggestion chips & marked parser
+│   └── index.html          # Glassmorphism UI, suggestion chips & Marked.js parser
+│
 ├── backend/
-│   └── lambda_function.py  # Lambda function handling prompt injection & Bedrock call
-└── README.md               # Documentation
+│   └── lambda_function.py  # Python backend with dynamic author prompt engineering
+└── README.md
